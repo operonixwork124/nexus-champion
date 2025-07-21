@@ -57,7 +57,7 @@ const Contact = () => {
                   <a
                     className='text-white hover:text-colorOrangyRed'
                   >
-                    williepowell@nexustech
+                    williepowell@nexusai
                   </a>
                 </li>
                 <li className='flex flex-col gap-x-2 leading-tight text-colorOrangyRed lg:flex-row lg:leading-normal'>
