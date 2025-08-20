@@ -318,6 +318,12 @@ const Navbar = ({ mobileMenu, setMobileMenu, color }) => {
               Contact
             </Link>
           </li>
+          
+          <li className='nav-item'>
+            <Link to='/jobs' className='nav-link-item'>
+              Job Openings
+            </Link>
+          </li>
         </ul>
       </nav>
     </div>
