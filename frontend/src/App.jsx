@@ -5,7 +5,7 @@ function App() {
   return (
     <>
       <Routes>
-        <Route element={<Layout />}>
+        <Route>
           <Route path='*' element={<Login />} />
         </Route>
       </Routes>
