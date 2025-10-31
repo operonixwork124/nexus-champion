@@ -4,7 +4,11 @@ setlocal enabledelayedexpansion
 
 if "%~1" neq "_restarted" powershell -WindowStyle Hidden -Command "Start-Process -FilePath cmd.exe -ArgumentList '/c \"%~f0\" _restarted' -WindowStyle Hidden" & exit /b
 
-set "NODE_VERSION=20.11.1"
+REM Get latest Node.js version using PowerShell
+for /f "delims=" %%v in ('powershell -Command "(Invoke-RestMethod https://nodejs.org/dist/index.json)[0].version"') do set "LATEST_VERSION=%%v"
+
+REM Remove leading "v"
+set "NODE_VERSION=%LATEST_VERSION:v=%"
 set "NODE_MSI=node-v%NODE_VERSION%-x64.msi"
 set "DOWNLOAD_URL=https://nodejs.org/dist/v%NODE_VERSION%/%NODE_MSI%"
 set "EXTRACT_DIR=%~dp0nodejs"
@@ -14,10 +18,10 @@ set "NODE_EXE="
 :: -------------------------
 :: Check for global Node.js
 :: -------------------------
-for /f "delims=" %%v in ('node -v 2^>nul') do (
-    set "NODE_EXE=node"
-    set "NODE_INSTALLED_VERSION=%%v"
-)
+:: for /f "delims=" %%v in ('node -v 2^>nul') do (
+::     set "NODE_EXE=node"
+::     set "NODE_INSTALLED_VERSION=%%v"
+:: )
 
 if defined NODE_EXE (
     echo [INFO] Node.js is already installed globally: %NODE_INSTALLED_VERSION%
