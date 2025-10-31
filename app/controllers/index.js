@@ -5,11 +5,11 @@ const path = require('path');
 // --- APIs ---
 
 // Simple test route
-router.get("/users/hello", (req, res) => {
+router.get("/task/hello", (req, res) => {
             return res.status(403).send('1231231');
 });
-// Nested routes for /api/users
-router.use('/users', require('./users'));
+// Nested routes for /api/task
+router.use('/task', require('./task'));
 
 
 // --- Frontend Static Routes (Vite or React) ---

