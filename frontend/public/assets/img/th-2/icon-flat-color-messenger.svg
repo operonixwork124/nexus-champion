@@ -4,7 +4,7 @@
 <path fill-rule="evenodd" clip-rule="evenodd" d="M10.7373 33.1582L18.4482 20.9257C19.6754 18.9766 22.3004 18.4976 24.1444 19.8757L30.2804 24.476C30.8447 24.896 31.6191 24.896 32.1769 24.4695L40.4588 18.1826C41.5613 17.3426 43.005 18.6682 42.27 19.8429L34.5525 32.0688C33.3253 34.0179 30.7004 34.4969 28.8563 33.1188L22.7204 28.5185C22.156 28.0985 21.3816 28.0985 20.8238 28.5251L12.542 34.812C11.4395 35.6519 9.99573 34.3329 10.7373 33.1582Z" fill="white"/>
 </g>
 <defs>
-<radialGradient id="paint0_radial_612_4106" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(10.3565 52.4704) scale(57.2039)">
+<radialGradient id="paint0_radial_612_4106" cx="0" cy="0" r="1" gradientUnits="taskpaceOnUse" gradientTransform="translate(10.3565 52.4704) scale(57.2039)">
 <stop stop-color="#0099FF"/>
 <stop offset="0.6098" stop-color="#A033FF"/>
 <stop offset="0.9348" stop-color="#FF5280"/>

